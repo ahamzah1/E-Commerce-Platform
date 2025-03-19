@@ -40,17 +40,17 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.findAll());
     }
 
-    @GetMapping("/exits/{customer-id}")
+    @GetMapping("/exits/{id}")
     public ResponseEntity<Boolean> existsById(@PathVariable String id){
         return ResponseEntity.ok(customerService.checkId(id));
     }
 
-    @GetMapping("/{customer-id}")
+    @GetMapping("/{id}")
     public ResponseEntity<CustomerResponse> findById(@PathVariable String id){
         return ResponseEntity.ok(customerService.findById(id));
     }
 
-    @DeleteMapping("/{customer-id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id){
         customerService.delete(id);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
