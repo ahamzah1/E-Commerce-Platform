@@ -13,15 +13,13 @@ import com.ahmad.productService.Exceptions.ProductPurchaseException;
 import com.ahmad.productService.Mappers.ProductMapper;
 import com.ahmad.productService.Repository.CategoryRepository;
 import com.ahmad.productService.Repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,6 +54,7 @@ public class ProductService {
         return productRepository.findAll().stream().map(item -> productMapper.toProductResponse(item)).collect(Collectors.toList());
     }
 
+    @Transactional
     public List<ProductPurchaseResponse> handlePurchase(List<ProductPurchaseRequest> inp) {
         List<Integer> productIds = inp.stream().map(ProductPurchaseRequest::getProductId).toList();
 
@@ -80,5 +79,33 @@ public class ProductService {
 
         }
         return purchaseProducts;
+    }
+    @Transactional
+    public void revert(List<ProductPurchaseRequest> inp) {
+        List<Integer> productIds = inp.stream()
+                .map(ProductPurchaseRequest::getProductId)
+                .toList();
+
+        // Fetch all products in one query
+        List<Product> storedProducts = productRepository.findAllByIdInOrderById(productIds);
+        if (storedProducts.size() != productIds.size()) {
+            throw new ProductPurchaseException("One or more products do not exist!");
+        }
+
+        // Convert to a Map for O(1) lookups (better than sorting + index matching)
+        Map<Integer, Product> productMap = storedProducts.stream()
+                .collect(Collectors.toMap(Product::getId, p -> p));
+
+        // Update quantities
+        for (ProductPurchaseRequest request : inp) {
+            Product product = productMap.get(request.getProductId());
+            if (product == null) {
+                throw new ProductPurchaseException("Product not found: " + request.getProductId());
+            }
+            product.setAvailable_quantity(product.getAvailable_quantity() + request.getQuantity());
+        }
+
+        // Save all in one batch (more efficient than individual saves)
+        productRepository.saveAll(storedProducts);
     }
 }

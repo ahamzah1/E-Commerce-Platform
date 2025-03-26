@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://ahmad:ahmad@host.docker.internal:27017/customer?authSource=admin
+      uri: mongodb://ahmad:ahmad@mongodb:27017/customer?authSource=admin
 
 server:
   port: 8090

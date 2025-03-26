@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   postgres:
     container_name: ms_pg_sql
@@ -13,21 +12,6 @@ services:
       - postgres:/var/lib/postgresql/data
     networks:
       - microservices-net
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: ms_pg_admin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin@pgadmin.org}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin:/var/lib/pgadmin
-    networks:
-      - microservices-net
-    depends_on:
-      - postgres
 
   mongo:
     image: mongo:6.0
@@ -84,14 +68,76 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ms_kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
     ports:
       - "9092:9092"
     depends_on:
       - zookeeper
     networks:
       - microservices-net
+
+  config-server:
+    build: ./services/config-server
+    container_name: config_server
+    ports:
+      - "8888:8888"
+    networks:
+      - microservices-net
+    depends_on:
+      - postgres
+
+  eureka-server:
+    build: ./services/Eureka-server
+    container_name: eureka_server
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-net
+    depends_on:
+      - config-server
+
+#  customer-service:
+#    build: ./services/customer-service
+#    container_name: ms_customer
+#    ports:
+#      - "8090:8090"
+#    networks:
+#      - microservices-net
+#    depends_on:
+#      - config-server
+#      - eureka-service
+#      - postgres
+
+#  product-service:
+#    build: ./services/product-service
+#    container_name: ms_product
+#    ports:
+#      - "8050:8050"
+#    networks:
+#      - microservices-net
+#    depends_on:
+#      - config-server
+#      - eureka-service
+#      - postgres
+#
+#  order-service:
+#    build: ./services/order-service
+#    container_name: ms_order
+#    ports:
+#      - "8070:8070"
+#    networks:
+#      - microservices-net
+#    depends_on:
+#      - config-server
+#      - eureka-service
+#      - postgres
+#      - kafka
 
 networks:
   microservices-net:

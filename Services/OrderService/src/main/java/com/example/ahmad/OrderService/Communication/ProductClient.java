@@ -13,4 +13,7 @@ public interface ProductClient {
     @PostMapping("/purchase")
     List<ProductPurchaseResponse> purchaseProducts(@RequestBody List<PurchaseRequest> requests);
 
+    @PostMapping("/purchase/revert")
+    void revertPurchaseProducts(@RequestBody List<PurchaseRequest> requests);
+
 }

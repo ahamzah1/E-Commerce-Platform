@@ -41,4 +41,9 @@ public class ProductController {
         return ResponseEntity.ok(productService.handleGetAll());
     }
 
+    @PostMapping("/purchase/revert")
+    public void revertProductPurchase(@Valid @RequestBody List<ProductPurchaseRequest> inp){
+        productService.revert(inp);
+    }
+
 }
