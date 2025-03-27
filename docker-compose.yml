@@ -13,7 +13,7 @@ services:
     networks:
       - microservices-net
 
-  mongo:
+  mongodb:
     image: mongo:6.0
     container_name: ms_mongo
     environment:
@@ -41,7 +41,7 @@ services:
     networks:
       - microservices-net
     depends_on:
-      - mongo
+      - mongodb
   mail-dev:
     container_name: ms_mail_dev
     image: maildev/maildev
@@ -52,9 +52,10 @@ services:
       - microservices-net
 
   zookeeper:
-    container_name: ms_zookeeper
+    container_name: zookeeper
     image: confluentinc/cp-zookeeper:7.4.0
     environment:
+      ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
@@ -62,19 +63,16 @@ services:
     networks:
       - microservices-net
 
-  kafka:
-    container_name: ms_kafka
+  kafka1:
+    container_name: kafka1
     image: confluentinc/cp-kafka:7.4.0
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ms_kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092
     ports:
       - "9092:9092"
     depends_on:
@@ -102,42 +100,54 @@ services:
     depends_on:
       - config-server
 
-#  customer-service:
-#    build: ./services/customer-service
-#    container_name: ms_customer
-#    ports:
-#      - "8090:8090"
-#    networks:
-#      - microservices-net
-#    depends_on:
-#      - config-server
-#      - eureka-service
-#      - postgres
+  customer-service:
+    build: ./services/customer-service
+    container_name: ms_customer
+    ports:
+      - "8090:8090"
+    networks:
+      - microservices-net
+    depends_on:
+      - config-server
+      - eureka-server
+      - mongodb
 
-#  product-service:
-#    build: ./services/product-service
-#    container_name: ms_product
-#    ports:
-#      - "8050:8050"
-#    networks:
-#      - microservices-net
-#    depends_on:
-#      - config-server
-#      - eureka-service
-#      - postgres
-#
-#  order-service:
-#    build: ./services/order-service
-#    container_name: ms_order
-#    ports:
-#      - "8070:8070"
-#    networks:
-#      - microservices-net
-#    depends_on:
-#      - config-server
-#      - eureka-service
-#      - postgres
-#      - kafka
+  product-service:
+    build: ./services/product-service
+    container_name: ms_product
+    ports:
+      - "8050:8050"
+    networks:
+      - microservices-net
+    depends_on:
+      - config-server
+      - eureka-server
+      - postgres
+
+  order-service:
+    build: ./services/orderService
+    container_name: ms_order
+    ports:
+      - "8070:8070"
+    networks:
+      - microservices-net
+    depends_on:
+      - config-server
+      - eureka-server
+      - postgres
+      - kafka1
+
+  payment-service:
+    build: ./services/payment-service
+    container_name: ms_payment
+    ports:
+      - "8020:8020"
+    networks:
+      - microservices-net
+    depends_on:
+      - config-server
+      - eureka-server
+      - postgres
 
 networks:
   microservices-net:

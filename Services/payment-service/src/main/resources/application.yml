@@ -2,7 +2,7 @@ spring:
   config:
     import: optional:configserver:http://config-server:8888  # Docker service name
   application:
-    name: product-service
+    name: payment-service
   cloud:
     config:
       uri: http://config-server:8888
@@ -11,4 +11,3 @@ spring:
         initial-interval: 2000
         max-interval: 10000
         max-attempts: 10
-

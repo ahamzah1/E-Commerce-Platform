@@ -13,6 +13,6 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 # 3. Copy the EXACT JAR name matching your pom.xml
-COPY --from=builder /app/target/customer-service-0.0.1-SNAPSHOT.jar app.jar
-EXPOSE 8090
+COPY --from=builder /app/target/payment-service-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8020
 ENTRYPOINT ["java", "-jar", "app.jar"]

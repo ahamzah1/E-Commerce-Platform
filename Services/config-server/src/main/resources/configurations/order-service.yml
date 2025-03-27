@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/order
+    url: jdbc:postgresql://postgres:5432/order
     username: ahmad
     password: ahmad
     driver-class-name: org.postgresql.Driver
@@ -9,19 +9,18 @@ spring:
       ddl-auto: update
       database: postgresql
       database-platform: org.hibernate.dialect.PostgreSQLDialect
-
-server:
-  port: 8070
+  kafka:
+    bootstrap-servers: kafka1:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    properties:
+      spring.json.type.mapping: orderConfirmation:com.example.ahmad.OrderService.Kafka.OrderConfirmation
 
 application:
   config:
-    customer-url: http://localhost:8090/customers
-    product-url: http://localhost:8050/products
+    customer-url: http://customer-service:8090/customers
+    product-url: http://product-service:8050/products
 
-  kafka:
-    producer:
-      bootstrap-servers: localhost:9092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.type.mapping: orderConfirmation:com.example.ahmad.OrderService.Kafka.OrderConfirmation
+server:
+  port: 8070
