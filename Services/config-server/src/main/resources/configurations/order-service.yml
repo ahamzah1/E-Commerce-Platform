@@ -21,6 +21,7 @@ application:
   config:
     customer-url: http://customer-service:8090/customers
     product-url: http://product-service:8050/products
+    payment-url: http://payment-service:8020/payment
 
 server:
   port: 8070

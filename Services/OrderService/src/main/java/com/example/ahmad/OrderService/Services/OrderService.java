@@ -1,13 +1,10 @@
 package com.example.ahmad.OrderService.Services;
 
+import com.example.ahmad.OrderService.Communication.*;
 import com.example.ahmad.OrderService.DTO.OrderResponse;
 import com.example.ahmad.OrderService.Entity.Order;
 import com.example.ahmad.OrderService.Entity.OrderLine;
 import com.example.ahmad.OrderService.Exceptions.BusinessException;
-import com.example.ahmad.OrderService.Communication.CustomerClient;
-import com.example.ahmad.OrderService.Communication.CustomerResponse;
-import com.example.ahmad.OrderService.Communication.ProductClient;
-import com.example.ahmad.OrderService.Communication.ProductPurchaseResponse;
 import com.example.ahmad.OrderService.DTO.OrderRequest;
 import com.example.ahmad.OrderService.Exceptions.OrderNotFoundException;
 import com.example.ahmad.OrderService.Kafka.OrderConfirmation;
@@ -31,15 +28,17 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private  final OrderLineService orderLineService;
     private final OrderProducer orderProducer;
+    private final PaymentClient paymentClient;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, CustomerClient customerClient, ProductClient productClient, OrderMapper orderMapper, OrderLineService orderLineService, OrderProducer orderProducer) {
+    public OrderService(OrderRepository orderRepository, CustomerClient customerClient, ProductClient productClient, OrderMapper orderMapper, OrderLineService orderLineService, OrderProducer orderProducer, PaymentClient paymentClient) {
         this.orderRepository = orderRepository;
         this.customerClient = customerClient;
         this.productClient = productClient;
         this.orderMapper = orderMapper;
         this.orderLineService = orderLineService;
         this.orderProducer = orderProducer;
+        this.paymentClient = paymentClient;
     }
 
     @Transactional
@@ -68,6 +67,14 @@ public class OrderService {
                             res
                     )
             );
+
+            PaymentRequest paymentRequest = new PaymentRequest();
+            paymentRequest.setOrderId(order_saved.getId());
+            paymentRequest.setAmount(order_saved.getTotalAmount());
+            paymentRequest.setCustomer(customer);
+            paymentRequest.setOrderReference(order_saved.getReference());
+            paymentRequest.setPaymentMethod(order_saved.getPaymentMethod());
+            paymentClient.createPayment(paymentRequest);
 
             return order_saved.getId();
 
