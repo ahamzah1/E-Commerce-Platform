@@ -149,6 +149,18 @@ services:
       - eureka-server
       - postgres
 
+  notification-service:
+    build: ./services/notification-service
+    container_name: ms_notify
+    ports:
+      - "8010:8010"
+    networks:
+      - microservices-net
+    depends_on:
+      - config-server
+      - eureka-server
+      - mongodb
+
 networks:
   microservices-net:
     driver: bridge

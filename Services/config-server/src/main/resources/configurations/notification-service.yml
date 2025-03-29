@@ -1,0 +1,32 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://ahmad:ahmad@mongodb:27017/notification?authSource=admin
+  kafka:
+    bootstrap-servers: kafka1:9092
+    consumer:
+      group-id: PaymentGroup, OrderGroup
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    properties:
+      spring.json.trusted.packages: '*'
+      spring.json.type.mapping: orderConfirmation:com.ahmad.notification_service.Kafka.Order.OrderConfirmation, paymentConfirmation:com.ahmad.notification_service.Kafka.Payment.PaymentConfirmation
+  mail:
+    host: mail-dev
+    port: 1025
+    username: ahmad
+    password: ahmad
+    properties:
+      mail:
+        smtp:
+          trust: '*'
+        auth: true
+        starttls:
+          enabled: true
+        connectiontimout: 5000
+        timeout: 3000
+        writetimeout: 5000
+
+server:
+  port: 8010
