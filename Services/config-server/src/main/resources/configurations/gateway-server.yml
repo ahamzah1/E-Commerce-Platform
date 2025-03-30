@@ -1,0 +1,27 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true  # Forces lowercase resolution
+      routes:
+        - id: customer-service
+          predicates:
+            - Path=/customers/**
+          uri: lb://customer-service
+        - id: order-service
+          predicates:
+            - Path=/order/**
+          uri: lb://ORDER-SERVICE
+        - id: order-line-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/order-line/**
+        - id: product-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/product/**
+
+server:
+  port: 8222
