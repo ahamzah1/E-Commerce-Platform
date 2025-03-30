@@ -6,7 +6,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
       database: postgresql
       database-platform: org.hibernate.dialect.PostgreSQLDialect
   kafka:
@@ -19,3 +19,8 @@ spring:
 
 server:
   port: 8020
+
+
+eureka:
+  instance:
+    hostname: payment-service

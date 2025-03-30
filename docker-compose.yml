@@ -6,8 +6,6 @@ services:
       POSTGRES_USER: ahmad
       POSTGRES_PASSWORD: ahmad
       PGDATA: /var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
@@ -21,8 +19,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ahmad
     volumes:
       - mongo:/data/db
-    ports:
-      - "27017:27017"
     networks:
       - microservices-net
     command: [--auth]
@@ -58,8 +54,6 @@ services:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
     networks:
       - microservices-net
 
@@ -73,8 +67,6 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092
-    ports:
-      - "9092:9092"
     depends_on:
       - zookeeper
     networks:
@@ -83,8 +75,6 @@ services:
   config-server:
     build: ./services/config-server
     container_name: config_server
-    ports:
-      - "8888:8888"
     networks:
       - microservices-net
     depends_on:
@@ -104,8 +94,6 @@ services:
   customer-service:
     build: ./services/customer-service
     container_name: ms_customer
-    ports:
-      - "8090:8090"
     networks:
       - microservices-net
     depends_on:
@@ -116,8 +104,6 @@ services:
   product-service:
     build: ./services/product-service
     container_name: ms_product
-    ports:
-      - "8050:8050"
     networks:
       - microservices-net
     depends_on:
@@ -128,8 +114,6 @@ services:
   order-service:
     build: ./services/orderService
     container_name: ms_order
-    ports:
-      - "8070:8070"
     networks:
       - microservices-net
     depends_on:
@@ -141,8 +125,6 @@ services:
   payment-service:
     build: ./services/payment-service
     container_name: ms_payment
-    ports:
-      - "8020:8020"
     networks:
       - microservices-net
     depends_on:
@@ -153,8 +135,6 @@ services:
   notification-service:
     build: ./services/notification-service
     container_name: ms_notify
-    ports:
-      - "8010:8010"
     networks:
       - microservices-net
     depends_on:

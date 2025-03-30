@@ -1,6 +1,5 @@
 eureka:
   instance:
-    hostname: eureka-server
     preferIpAddress: false
   client:
     service-url:
