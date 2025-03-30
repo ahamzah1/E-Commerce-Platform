@@ -19,9 +19,9 @@ spring:
 
 application:
   config:
-    customer-url: http://customer-service:8090/customers
-    product-url: http://product-service:8050/products
-    payment-url: http://payment-service:8020/payment
+    customer-url: http://gateway-server:8222/customers
+    product-url: http://gateway-server:8222/products
+    payment-url: http://gateway-server:8222/payment
 
 server:
   port: 8070
