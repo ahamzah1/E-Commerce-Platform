@@ -90,6 +90,37 @@ services:
     depends_on:
       - config-server
 
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - microservices-net
+
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:24.0.2
+    ports:
+      - "9098:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    networks:
+      - microservices-net
+    command:
+      - "start-dev"
+
+  gateway-server:
+    build: ./services/gateway
+    container_name: gateway_server
+    ports:
+      - "8222:8222"
+    networks:
+      - microservices-net
+    depends_on:
+      - config-server
+
 
   customer-service:
     build: ./services/customer-service
@@ -142,15 +173,8 @@ services:
       - eureka-server
       - mongodb
 
-  gateway-server:
-    build: ./services/gateway
-    container_name: gateway_server
-    ports:
-      - "8222:8222"
-    networks:
-      - microservices-net
-    depends_on:
-      - config-server
+
+
 
 networks:
   microservices-net:

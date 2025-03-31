@@ -1,7 +1,15 @@
 server:
   port: 8222
+
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/micro-services
   cloud:
+    default-filters:
+      - TokenRelay
     gateway:
       discovery:
         locator:
